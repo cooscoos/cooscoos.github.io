@@ -128,27 +128,27 @@ fn threedee_print(note: String) {
 In this analogy, our written note is a `String`. A written note or a `String` is a good choice when:
 
 - we can't anticipate what a dog's name will be when we open our business (we have no foresight at compile time), and/or;
-- we want the option to alter what we've written down --- both notes and `String`s can be mutable (unlike a steel moulds and `&strs`).
+- we want the option to alter what we've written down --- both notes and `String`s can be mutable (unlike a steel moulds and `&str`s).
 
-We still want to fulfil these orders for weird dog names because we're a business and we flippin' love money. This means we need to commit some flexible resources to this task, but we don't know even how many yet.
+We still want to fulfil these orders for weird dog names because we're a business and we flippin' love money. This means we need to commit some flexible resources to this task, but we don't know how many yet.
 
 <figure style="width: 300px" class="align-right">
   <img src="{{ site.url }}{{ site.baseurl }}/assets/images/post_imgs/gorilla.jpg" alt="">
   <figcaption>Ceci est me dog.[img: <a href="https://www.pexels.com/@pixabay/">Pixabay</a>]</figcaption>
 </figure> 
 
-The names might be short, they might be long, we might get hundreds of names, thousands, or even none.
+The requests for dog names might be short names, they might be long, we might get hundreds of names, thousands, or even none.
 
 To be safe, we keep a heap of paper and pencils aside just in case (paper and pencils are computer memory here, by the way, yeah-I-know-you-knew-that).
 
-Could we send a mould to a 3D printing company who are expecting written notes? In other slapdash languages, you could totally do this, but in Rust, the answer is rigidly "no".
+Could we send a mould to a 3D printing company who are expecting written notes? In other languages, you could totally do this and expect the language to handle the conversions, but in Rust, the answer is rigidly "no".
 
 
 ### You've lost your note!
 
 Disaster strikes. The 3D printing company started printing one of your doggy nameplates, but the print failed and they already threw your note away. The customer is waiting.
 
-It was "Harambe" something, right? But... can you remember the sequence of numbers? Chances are that you've forgotten, and what's worse, you sent (or "moved") your one copy of the note to the 3D printers, and they don't give it back!
+It was "Harambe" something, right? But can you remember the sequence of numbers? Chances are that you've forgotten, and what's worse, you sent (or "moved") your one copy of the note to the 3D printers, and they don't give it back!
 
 You can try calling `threedee_print(note);` again in your program, but the Rust compiler will rightly tell you that you're trying to do the impossible and re-use a note that you no longer own.
 
@@ -188,7 +188,7 @@ We haven't moved our `original`, so it stays in scope, and so we can use it agai
 
 #### 2. Returning the String
 
-Asking the 3D printer to return a copy of the note, or the original note, is achieved by modifying the threedee_print function.
+Asking the 3D printers to return a copy of the note, or the original note, is achieved by modifying the threedee_print function.
 
 {% highlight rust %}
 // The printers will print the nameplate and return the note
@@ -230,7 +230,7 @@ fn threedee_print(shop_window: &String) {
 
 The ampersand in front of `&original` means were're sending `threedee_print` a 'reference to a String', called a `&String`.
 
-Using `println!` in this example isn't great --- `println!` does a lot of hard work in the backround to be useful, so it will print out the note regardless of whether we pass it an actual note, or point it at where the note is (our shop window).
+Using `println!` in this example isn't great --- `println!` does a lot of hard work in the backround to be useful, so it will print out the note regardless of whether we pass it an actual note, or point to where the note is (our shop window).
 
 To illustrate what's happening better, we'll create a struct called `DeskPlate`. This struct is not clever like `println!`; it's very strict about having `dog_name` as a `String`, and it won't accept anything else.
 
@@ -316,13 +316,13 @@ Did you get given a name that you didn't anticipate when you set up your busines
 
 #### String to &'a str: you can do this
 
-A customer with a dog named "Lord Gumzies" is insisting on a moulded nameplate, they do not want a 3D print. 3D prints look all weird and ribbed.
+A customer with a dog named "Lord Gumzies" is insisting on a moulded nameplate, they do not want a 3D print because "3D prints look all weird and ribbed".
 
 There is something you could do --- you could try and cobble together your own mould out of polystyrene. Sure, it won't last as long as a steel mould, and you couldn't pour hot plastic into it, but maybe you could pour silicone into it instead.
 
 A polystyrene mould is what a `&'a str` is. That cheeky `'a` thing is called a "lifetime". Lifetimes are probably a topic for another article. All you need to know is that an `&'a str` has a lifetime specifier `'a` which tells you how long the mould is going to last for.
 
-Rust's compiler can often figure out how long a variable needs to last for, all on its own. Well done, Rust. If it can't do this, then clippy will moan at you and you'll need to define the lifetime... but, let's not get off track.
+Rust's compiler can often figure out how long a variable needs to last for, all on its own. Well done, Rust. If it can't do this, then clippy will moan at you and you'll need to define the lifetime... but let's not get off track.
 
 To convert a `String` to a `&'a str`, we do this:
 {% highlight rust %}
@@ -340,7 +340,7 @@ fn main() {
 }
 {% endhighlight %}
 
-Beware reader, be very ware. The use of the term "str" in the `as_str()` method doesn't mean you're making a `&'static str`. In fact `as_str()`, will always produce a mould with a lifetime which is **not static**. Rust's compiler will try its best to make the lifetime of the variable, or the longevity of that mould, as long as it needs to be, but it can never ever be `&'static`. A `&'static str` that last forever must be defined at compile time.
+Beware reader, be very ware. The use of the term "str" in the `as_str()` method doesn't mean you're making a `&'static str`. In fact `as_str()` will always produce a mould with a lifetime which is **not static**. Rust's compiler will try its best to make the lifetime of the variable, or the longevity of that mould, as long as it needs to be, but it can never ever be `&'static`. A `&'static str` that lasts forever must be defined at compile time.
 
 This matters because if we now try to pour hot plastic into our polystyrene mould:
 
@@ -353,7 +353,7 @@ This matters because if we now try to pour hot plastic into our polystyrene moul
 
 we're going to end up with a hot mess. Remember, the function `fn hot_plastic(steel_mould: &'static str)` is expecting a `&'static str` --- a steel mould that lasts forever. We've just passed it a polystyrene mould, which will last for "some limited amount of time". "Forever" is much more restrictive, so we can't use this function.
 
-How can we solve this? Well we need to define a new function, one which accepts a `&'a str`. Here's one:
+How can we solve this? We need to define a new function, one which accepts a `&'a str`. Here's one:
 
 {% highlight rust %}
 // Pour silicone in, get nameplate out
@@ -368,7 +368,7 @@ But hang on, I told you that `&str` in your IDE always means `&'static str`, did
 
 To recap:
 
-- `&str` in a variable defined at compile time means a `&'static str`, which lasts forever;
+- `&str` as a variable defined at compile time probably means a `&'static str`, which lasts forever;
 - `&str` in a function's arguments means `&'a str`, which has a lifetime which might be limited.
 
 Other than that, a `&'a str` has similar behaviour to `&'static str`. They're immutable, and using them instead of `String` types can be more efficient sometimes.
