@@ -1,0 +1,406 @@
+---
+# > This is how to do a quote
+
+#layout: post
+title:  "&stress about &Strings"
+date:   2022-09-12 06:33:00 +0100
+#last_modified_at: 2016-03-09T16:20:02-05:00
+categories: Blog
+tags: types
+#link: https://github.com
+header:
+  image: /assets/images/post_imgs/ropes.jpg
+  image_description: Bundle of ropes
+  caption: "Photo by [**Jonathon Cooper**](https://www.pexels.com/@theshuttervision/)"
+---
+There's [one][rust-lang] --- or [a few][rust-by-example] --- [lots][thoughtgram] --- even [dozens][becomebetter] --- of good resources that cover the differences between a `&str`, `&'static str`, `&'a str`, `String`, and `&String` in Rust.
+
+Most of these start by covering:
+- the heap and the stack;
+- ownership, and;
+- lifetimes;
+
+and while that's all important, it can feel like a lot when you're starting out.
+
+So, let's try something different.
+
+Here, we'll use an analogy, and look at some code along the way.
+
+Analogies ain't perfect, but I hope this one makes the topic stick better for some of you. If it does, you can return to those other resources with some intuition.
+
+
+
+## You run a desk nameplate business for dogs
+
+Bear with me here.
+
+You want to set up a business where you sell plastic desk nameplates for dogs in high places.
+
+To make these nameplates you have two options:
+1. Get some real nice steel moulds made up (you can only do this once, ever). You can then pour molten plastic into these moulds in your shop whenever you want to make a nameplate.
+
+2. Send the dog's name to a 3D printing business and ask them to make you a nameplate on demand.
+
+<figure class="align-center">
+  <img src="{{ site.url }}{{ site.baseurl }}/assets/images/post_imgs/nameplate.jpg" alt="">
+  <figcaption>Buckle up. [img: <a href="https://www.pexels.com/@rodnae-prod/">RODNAE Productions</a>]</figcaption>
+</figure> 
+
+
+### &'static str: commit resources to a specific task ahead of time
+
+Check you out. You're smart. You've done some market research about dogs, so you know ahead of time that you'll get lots of requests for "Max", "Charlie", and "Rolo" nameplates. For these names, it would make sense to get a stack of steel moulds made up ahead of time.
+
+Let's do this for "Rolo":
+
+{% highlight rust %}
+fn main() {
+	let steel_mould: &'static str = "Rolo";
+	hot_plastic(steel_mould);
+}
+
+// Pour plastic in, get nameplate out
+fn hot_plastic(steel_mould: &'static str) {
+	println!("{steel_mould}");
+}
+{% endhighlight %}
+
+`steel_mould` here is a `&'static str`. The `'static` part means that this "Rolo" variable (mould) is going to last for as long as our program (or business) runs.
+
+<figure style="width: 250px" class="align-left">
+  <img src="{{ site.url }}{{ site.baseurl }}/assets/images/post_imgs/pug.jpg" alt="">
+  <figcaption>Future you, handling Rolo with finesse and ease. [img: <a href="https://www.pexels.com/@babydov/">Ivan Babydov</a>]</figcaption>
+</figure> 
+
+Getting this "Rolo" mould made up as a `&'static str` required foresight, didn't it? At compile time, you had to know that you wanted to permanently commit your limited resources (be that money or memory) to the name "Rolo". As a reward, you get a mould that lasts ~forever~.
+  
+Sure, we can't change the mould after we've made it (or in other words, our `&'static str` is "immutable"), but we don't care, because we know we're going to use this mould a lot.
+
+There's a thing to be aware of though. If you type `let steel_mould = "Rolo";`, your IDE will probably display:
+
+{% highlight rust %}
+let steel_mould: &str = "Rolo"
+{% endhighlight %}
+
+so, notice it says the type is just `&str` without the `'static` part. Even though your IDE doesn't explicitly say it, this `&str` is a `&'static str` --- it's not "_like_" one --- it absolutely _is_ one. 
+
+In fact, any text defined at compile time (also called a "string literal") is a `&'static str`. It lasts forever.
+
+This point might lead to confusion later, so bear in mind that when we're defining variables at compile time, a `&str` and a `&'static str` are exactly the same thing.
+
+
+### String: committing resources to unspecific tasks
+
+Would it make sense to make steel moulds for every dog name that exists? Not if you want your business to stay afloat! Some names will be rarer; they aren't worth such a specific investment.
+
+If someone comes in and asks for a nameplate for their completely normal dog called "Harambe794524", then we're better off sending that to the 3D printers.
+
+There are three steps to sending a dog name to the 3D printers:
+
+1. we ask the customer what their dog's name is, and write it down on a note;
+2. we send that note to the 3D printers, and then;
+3. they produce a nameplate that they send to the customer.
+
+They don't return our note to us --- we don't need it.
+
+{% highlight rust %}
+fn main() {
+
+	// Get your peice of paper ready
+	let mut original = String::new();
+
+	// Ask for the name of the dog and write it down
+	std::io::stdin()
+		.read_line(&mut original)
+		.expect("Failed to read input dog name");
+
+	// Send the note to the printers
+	threedee_print(original);
+
+}
+  
+// The printers will print the nameplate
+fn threedee_print(note: String) {
+	println!("{note}");
+}
+{% endhighlight %}
+
+In this analogy, our written note is a `String`. A written note or a `String` is a good choice when:
+
+- we can't anticipate what a dog's name will be when we open our business (we have no foresight at compile time), and/or;
+- we want the option to alter what we've written down --- both notes and `String`s can be mutable (unlike a steel moulds and `&strs`).
+
+We still want to fulfil these orders for weird dog names because we're a business and we flippin' love money. This means we need to commit some flexible resources to this task, but we don't know even how many yet.
+
+<figure style="width: 300px" class="align-right">
+  <img src="{{ site.url }}{{ site.baseurl }}/assets/images/post_imgs/gorilla.jpg" alt="">
+  <figcaption>Ceci est me dog.[img: <a href="https://www.pexels.com/@pixabay/">Pixabay</a>]</figcaption>
+</figure> 
+
+The names might be short, they might be long, we might get hundreds of names, thousands, or even none.
+
+To be safe, we keep a heap of paper and pencils aside just in case (paper and pencils are computer memory here, by the way, yeah-I-know-you-knew-that).
+
+Could we send a mould to a 3D printing company who are expecting written notes? In other slapdash languages, you could totally do this, but in Rust, the answer is rigidly "no".
+
+
+### You've lost your note!
+
+Disaster strikes. The 3D printing company started printing one of your doggy nameplates, but the print failed and they already threw your note away. The customer is waiting.
+
+It was "Harambe" something, right? But... can you remember the sequence of numbers? Chances are that you've forgotten, and what's worse, you sent (or "moved") your one copy of the note to the 3D printers, and they don't give it back!
+
+You can try calling `threedee_print(note);` again in your program, but the Rust compiler will rightly tell you that you're trying to do the impossible and re-use a note that you no longer own.
+
+This is the problem with sending a String to a function. As soon as you send your one copy, you've lost it. You can't use it again for anything else.
+
+So, what are your options? Well, next time, you could:
+1. make a clone of your note and send that instead;
+2. ask the 3D printers to start returning a copy, or;
+3. keep the note, put it up in your shop window, and tell the 3D printers that they need to send someone round to look at it.
+
+All of these approaches can be used in Rust.
+
+
+#### 1. Make a clone()
+
+Cloning the note before we send it means we can use the original note again afterwards.
+
+{% highlight rust %}
+fn main() {
+	// Get your peice of paper ready
+	let mut original = String::new();
+
+	// --snip-- (ask customer for dog's name, write it down)
+
+	// Make a copy of the note
+	let note_copy = original.clone();
+
+	// Send the copy to the printers, keeping the original
+	threedee_print(note_copy);
+}
+{% endhighlight %}
+
+In this case `note_copy` has "moved" into the function `threedee_print`, and therefore it is no longer in scope of `main`.
+
+We haven't moved our `original`, so it stays in scope, and so we can use it again.
+
+
+#### 2. Returning the String
+
+Asking the 3D printer to return a copy of the note, or the original note, is achieved by modifying the threedee_print function.
+
+{% highlight rust %}
+// The printers will print the nameplate and return the note
+fn threedee_print(note: String) -> String {
+	println!("{note}");
+	note // give a copy (or the original) note back!
+}
+{% endhighlight %}
+
+We actually have no way of knowing whether the 3D printers have returned the original note, or an identical copy of it. They'll do whatever is most efficient, and the Rust compiler is exactly the same in this regard.
+
+Worrying about whether we have an original or a copy is academic --- we don't care --- we get an accurate note back, and so can now call:
+```
+let note_back = threedee_print(note);
+```
+in our `main` function, and continue to use `note_back` as we please.
+
+
+#### 3. Use a reference with &String
+
+Our last option was putting the note up in our shop window and asking the 3D printers to look at the note, and use it as a reference:
+
+{% highlight rust %}
+fn main() {
+	//-- snip --
+
+	// Tell the printers to look at your copy
+	threedee_print(&original);
+
+	// Do it again if you like
+	threedee_print(&original);
+}
+
+// The printers will print the nameplate based on a reference
+fn threedee_print(shop_window: &String) {
+	println!("{shop_window}");
+}
+{% endhighlight %}
+
+The ampersand in front of `&original` means were're sending `threedee_print` a 'reference to a String', called a `&String`.
+
+Using `println!` in this example isn't great --- `println!` does a lot of hard work in the backround to be useful, so it will print out the note regardless of whether we pass it an actual note, or point it at where the note is (our shop window).
+
+To illustrate what's happening better, we'll create a struct called `DeskPlate`. This struct is not clever like `println!`; it's very strict about having `dog_name` as a `String`, and it won't accept anything else.
+
+**Warning:** This won't compile.
+{: .notice--warning}
+{% highlight rust %}
+// Define a struct for the Deskplate
+struct DeskPlate{
+	dog_name: String,
+}
+  
+// The printers will print the nameplate based on a reference
+fn threedee_print(shop_window: &String) -> DeskPlate{
+	DeskPlate{dog_name: shop_window} // ! This won't work
+}
+{% endhighlight %}
+
+
+
+In the example above, we've told the 3D printers to try and create a DeskPlate based on a location (your shop window). Your shop window is not a dog's name --- it is a place where you can find a dog's name, and so the code won't compile.
+
+We need to be more explicit. We need to tell the printers to  make their own copy of our shop window note by using  `note.to_owned()` or `note.clone()`:
+
+{% highlight rust %}
+fn threedee_print(shop_window: &String) -> DeskPlate{
+	// Ask the 3D printers to make a copy of what they see in your shop window
+	let note_copy = shop_window.to_owned();
+	DeskPlate{name: note_copy} // This runs fine
+}
+{% endhighlight %}
+
+Doing this will make the code compile fine.
+
+Bit of an aside, but if you have come across the dereferencing operator `*` before, you might wonder why you can't just use that and type `Deskplate{name: *note_copy}`. This doesn't work here, because dereferencing is sometimes achieved by making a copy of the variable, and Strings don't implement the copy trait.
+
+
+### Converting between notes and moulds, String and &str
+
+#### &'static str to String: easy peasy
+Could we choose to 3D print a nameplate like "Rolo" even though we already have a steel mould? Yes, because we can always look at our mould and write down what we see in a note, converting a `&'static str` into a `String` like so:
+
+{% highlight rust %}
+fn main() {
+	let mould: &str = "Rolo";
+  
+	// Let's write down a note based on what we see in our mould
+	let note = name.to_string();
+
+	threedee_print(note);
+}
+{% endhighlight %}
+
+
+#### String to &'static str: hardy ... pardy?
+Converting a `String` to a `&'static str` is not as trivial.
+
+The factory that makes steel moulds (i.e. the compiler) can do this, but it only gets  run once. Turning a String into a &'static str is what happens when we type `let mould: &str = "Rolo"` into our IDE before the code is compiled.
+
+After we're running though? No chance. The best you can do is to hope that you already have a steel mould that matches your note, like this:
+
+{% highlight rust %}
+fn main() {
+
+	// Someone has given you a note that says Rolo on it
+	let note: String = "Rolo".to_string();
+
+	let mould: &'static str = match note {
+		_ if note == "Rolo" => "Rolo",
+		_ => panic!("I don't have the mould!")
+	};
+}
+{% endhighlight %}
+
+What you've done here, is looked at the note, gone into the back room and tried to find a mould that matches your note. If the note says "Rolo", you're in luck, because past you was wise. Nice.
+
+Did you get given a name that you didn't anticipate when you set up your business? Well you ain't using a steel mould then, matey. Time to panic (or maybe fail gracefully and send the note to the 3D printers instead).
+
+<figure style="width: 350px" class="align-center">
+  <img src="{{ site.url }}{{ site.baseurl }}/assets/images/post_imgs/string_hat.jpg" alt="">
+  <figcaption>Eric has panicked when parsing String. [img: <a href="https://www.pexels.com/@vitoriasantos/">Vitoria Santoss</a>] </figcaption>
+</figure> 
+
+
+#### String to &'a str: you can do this
+
+A customer with a dog named "Lord Gumzies" is insisting on a moulded nameplate, they do not want a 3D print. 3D prints look all weird and ribbed.
+
+There is something you could do --- you could try and cobble together your own mould out of polystyrene. Sure, it won't last as long as a steel mould, and you couldn't pour hot plastic into it, but maybe you could pour silicone into it instead.
+
+A polystyrene mould is what a `&'a str` is. That cheeky `'a` thing is called a "lifetime". Lifetimes are probably a topic for another article. All you need to know is that an `&'a str` has a lifetime specifier `'a` which tells you how long the mould is going to last for.
+
+Rust's compiler can often figure out how long a variable needs to last for, all on its own. Well done, Rust. If it can't do this, then clippy will moan at you and you'll need to define the lifetime... but, let's not get off track.
+
+To convert a `String` to a `&'a str`, we do this:
+{% highlight rust %}
+fn main() {
+
+	// Get your peice of paper ready
+	let mut original = String::new();
+	
+	// Ask for the name of the dog and write it down
+	// -- snip --
+
+	// Make a polystyrene mould
+	let poly_mould = original.as_str();
+
+}
+{% endhighlight %}
+
+Beware reader, be very ware. The use of the term "str" in the `as_str()` method doesn't mean you're making a `&'static str`. In fact `as_str()`, will always produce a mould with a lifetime which is **not static**. Rust's compiler will try its best to make the lifetime of the variable, or the longevity of that mould, as long as it needs to be, but it can never ever be `&'static`. A `&'static str` that last forever must be defined at compile time.
+
+This matters because if we now try to pour hot plastic into our polystyrene mould:
+
+**Warning:** This won't compile.
+{: .notice--warning}
+{% highlight rust %}
+	//Pour plastic in, get nameplate out?
+	hot_plastic(poly_mould); // ! won't run
+{% endhighlight %}
+
+we're going to end up with a hot mess. Remember, the function `fn hot_plastic(steel_mould: &'static str)` is expecting a `&'static str` --- a steel mould that lasts forever. We've just passed it a polystyrene mould, which will last for "some limited amount of time". "Forever" is much more restrictive, so we can't use this function.
+
+How can we solve this? Well we need to define a new function, one which accepts a `&'a str`. Here's one:
+
+{% highlight rust %}
+// Pour silicone in, get nameplate out
+fn silicone(any_mould: &str) {
+	println!("{any_mould}");
+}
+{% endhighlight %}
+
+We can now pass this function a `poly_mould: &'a str` and it will work.
+
+But hang on, I told you that `&str` in your IDE always means `&'static str`, didn't I? Yep, but only when you're defining variables. If you see the term `&str` in a function's arguments, it implicity means `&'a str`.
+
+To recap:
+
+- `&str` in a variable defined at compile time means a `&'static str`, which lasts forever;
+- `&str` in a function's arguments means `&'a str`, which has a lifetime which might be limited.
+
+Other than that, a `&'a str` has similar behaviour to `&'static str`. They're immutable, and using them instead of `String` types can be more efficient sometimes.
+
+#### Using a &'static str in a &'a str function
+
+We can pass the function `fn silicone` a `&'a str`, but how about passing it a `&'static str`? Can we pour silicone into a steel mould?
+
+Yes, because the function `silicone` is not very restrictive: it doesn't demand variables which last "forever": it will accept a variable which lasts for any amount of time.
+
+In other words:
+
+- a `&'static str `is a type of `&'a str`. A lifetime of "forever" is still some amount of time
+- a `&'str` is not a `&'static str`. Some amount of time is not always "forever".
+
+
+
+
+## Summary
+
+<figure style="width: 200px" class="align-right">
+  <img src="{{ site.url }}{{ site.baseurl }}/assets/images/post_imgs/mould.jpg" alt="">
+  <figcaption>Plastic YUMMY. [img: <a href="https://www.pexels.com/@andres-ayrton/">Andres Ayrton</a>]</figcaption>
+</figure> 
+
+If you understood how to run a desk nameplate business for dogs, then you understand the logic behind Rust's approach to string types.
+
+Now go back and try again. Read all of those good articles that talk about the heap, the stack, ownership and lifetimes. Keep this analogy of writtten notes and steel moulds going if it helps you, but drop it once it becomes cumbersome.
+
+Woof.
+
+[rust-by-example]: https://doc.rust-lang.org/rust-by-example/std/box.html
+[thoughtgram]: https://blog.thoughtram.io/string-vs-str-in-rust/
+[becomebetter]: https://www.becomebetterprogrammer.com/rust-string-vs-str/
+[rust-lang]: https://doc.rust-lang.org/stable/book/ch04-01-what-is-ownership.html
