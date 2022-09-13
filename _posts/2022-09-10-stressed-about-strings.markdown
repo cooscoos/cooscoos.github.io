@@ -37,7 +37,7 @@ Bear with me here.
 You want to set up a business where you sell plastic desk nameplates for dogs in high places.
 
 To make these nameplates you have two options:
-1. Get some real nice steel moulds made up (you can only do this once, ever). You can then pour molten plastic into these moulds in your shop whenever you want to make a nameplate.
+1. Get some real nice steel moulds made up (you can only do this once, ever). You are not allowed to touch these moulds, but you can point them out to a technician who will then pour molten plastic into these moulds in your shop whenever you want to make a nameplate.
 
 2. Send the dog's name to a 3D printing company and ask them to make you a nameplate on demand.
 
@@ -59,24 +59,28 @@ fn main() {
 	hot_plastic(steel_mould);
 }
 
-// Pour plastic in, get nameplate out
+// Ask your technician to pour plastic in, get nameplate out
 fn hot_plastic(steel_mould: &'static str) {
 	println!("{steel_mould}");
 }
 {% endhighlight %}
 
-`steel_mould` here is a `&'static str`. The `'static` part means that this "Rolo" variable (mould) is going to last for as long as our program (or business) runs.
+`steel_mould` here is a "string literal" --- a hard-coded string in the binary of your program. In this analogy, string literals are our steel moulds. They have the type `&'static str`. The `&` part of it means that we can use the steel mould as a reference (we can tell other functions, like our technician, where the steel moulds are), and the `'static` part means that we be certain that we can safely make reference to this mould for as long as our program (or business) is running.
 
 <figure style="width: 250px" class="align-left">
   <img src="{{ site.url }}{{ site.baseurl }}/assets/images/post_imgs/pug.jpg" alt="">
   <figcaption>Future you, handling Rolo with finesse and ease. [img: <a href="https://www.pexels.com/@babydov/">Ivan Babydov</a>]</figcaption>
 </figure> 
 
-Getting this "Rolo" mould made up as a `&'static str` required foresight, didn't it? At compile time, you had to know that you wanted to permanently commit your limited resources (be that money or memory) to the name "Rolo". As a reward, you get a mould that lasts ~forever~.
-  
-Sure, we can't change the mould after we've made it (or in other words, our `&'static str` is "immutable"), but we don't care, because we know we're going to use this mould a lot.
+Getting this "Rolo" mould made up as a string literal required foresight, didn't it? At compile time, you had to know that you wanted to commit some resources (be that money or memory) to the name "Rolo". As a reward, you get a string literal: a steel mould that you can point out to your technician for as long as you need to.
 
-Here's a thing to be aware of though. If you type `let steel_mould = "Rolo";`, your IDE will probably display:
+Notice that you, or indeed any other function, never gets to directly touch or change the steel mould:
+- You can only tell your technician _where_ the mould is, i.e. you point them to a reference, and;
+- the object behind that reference is unchangeable (or in other words, our `&'static str` is "immutable").
+
+But that's fine for us, because we know we're going to use this "Rolo" mould a lot.
+
+One other thing to be aware of: if you type `let steel_mould = "Rolo";`, your IDE will probably display:
 
 {% highlight rust %}
 let steel_mould: &str = "Rolo"
@@ -84,7 +88,7 @@ let steel_mould: &str = "Rolo"
 
 so, notice it says the type is just a `&str` without the `'static` part. Even though your IDE doesn't explicitly say it, this `&str` is a `&'static str` --- it's not "_like_" one --- it absolutely _is_ one. 
 
-In fact, any text defined at compile time (also called a "string literal") is a `&'static str`. It lasts forever.
+In fact, any text defined at compile time (a "string literal") is a `&'static str`. It can safely be used as a reference for as long as you want.
 
 This point might lead to confusion later, so bear in mind that when we're defining variables at compile time, a `&str` and a `&'static str` are exactly the same thing.
 
@@ -264,9 +268,6 @@ fn threedee_print(shop_window: &String) -> DeskPlate{
 
 Doing this will make the code compile fine.
 
-Bit of an aside here, but: if you have come across the dereferencing operator `*` before, you might wonder why you can't just use that and type `Deskplate{name: *note_copy}`. This doesn't work here, because dereferencing is sometimes achieved by making a copy of the variable, and Strings don't implement the copy trait.
-{: .notice}
-
 ### Converting between notes and moulds, String and &str
 
 #### &'static str to String: easy peasy
@@ -287,7 +288,7 @@ fn main() {
 #### String to &'static str: hardy ... pardy?
 Converting a `String` to a `&'static str` is not so trivial.
 
-The factory that makes steel moulds (i.e. the compiler) can do this, but it only gets  run once. Turning a String into a &'static str is what happens when we type `let mould: &str = "Rolo"` into our IDE before the code is compiled.
+The factory that makes steel moulds (i.e. the compiler) can do this, but it only gets run once. Turning a String into a &'static str is kind of what happens when we type `let mould: &str = "Rolo"` into our IDE before the code is compiled.
 
 After we're running though? No chance. The best you can do is to hope that you already have a steel mould that matches your note, like this:
 
@@ -307,6 +308,9 @@ fn main() {
 What you've done here, is looked at the note, gone into the back room and tried to find a mould that matches your note. If the note says "Rolo", you're in luck, because past you was wise. Nice.
 
 Did you get given a name that you didn't anticipate when you set up your business? Well you ain't using a steel mould then, matey.
+
+Kind of. There are ways to [leak the memory of a String to produce a &'static str](https://stackoverflow.com/questions/23975391/how-to-convert-a-string-into-a-static-str), but they go beyond the scope of this simple analogy.
+{: .notice}
 
 <figure style="width: 350px" class="align-center">
   <img src="{{ site.url }}{{ site.baseurl }}/assets/images/post_imgs/string_hat.jpg" alt="">
