@@ -4,7 +4,7 @@
 #layout: post
 title:  "&stress about &Strings"
 date:   2022-09-12 06:33:00 +0100
-#last_modified_at: 2016-03-09T16:20:02-05:00
+last_modified_at: 2022-09-13T08:00:00:00
 categories: Blog
 tags: types
 #link: https://github.com
@@ -13,7 +13,7 @@ header:
   image_description: Bundle of ropes
   caption: "Photo by [**Jonathon Cooper**](https://www.pexels.com/@theshuttervision/)"
 ---
-There's [one][rust-lang] --- or [a few][rust-by-example] --- [lots][thoughtgram] --- even [dozens][becomebetter] --- of good resources that cover the differences between a `&str`, `&'static str`, `&'a str`, `String`, and `&String` in Rust.
+There's [one][rust-lang] --- [a few][rust-by-example] --- [lots][thoughtgram] --- even [dozens][becomebetter] --- of good articles that explain the differences between a `&str`, `&'static str`, `&'a str`, `String`, and `&String` in Rust.
 
 Most of these start by covering:
 - the heap and the stack;
@@ -22,11 +22,11 @@ Most of these start by covering:
 
 and while that's all important, it can feel like a lot when you're starting out.
 
-So, let's try something different.
+Let's try something different.
 
 Here, we'll use an analogy, and look at some code along the way.
 
-Analogies ain't perfect, but I hope this one makes the topic stick better for some of you. If it does, you can return to those other resources with some intuition.
+Analogies ain't perfect, but I hope this one makes the topic stick better for some of you. If it does, you can return to those other articles with some intuition.
 
 
 
@@ -39,11 +39,11 @@ You want to set up a business where you sell plastic desk nameplates for dogs in
 To make these nameplates you have two options:
 1. Get some real nice steel moulds made up (you can only do this once, ever). You can then pour molten plastic into these moulds in your shop whenever you want to make a nameplate.
 
-2. Send the dog's name to a 3D printing business and ask them to make you a nameplate on demand.
+2. Send the dog's name to a 3D printing company and ask them to make you a nameplate on demand.
 
 <figure class="align-center">
   <img src="{{ site.url }}{{ site.baseurl }}/assets/images/post_imgs/nameplate.jpg" alt="">
-  <figcaption>Buckle up. [img: <a href="https://www.pexels.com/@rodnae-prod/">RODNAE Productions</a>]</figcaption>
+  <figcaption>A desk nameplate for a mere human being. [img: <a href="https://www.pexels.com/@rodnae-prod/">RODNAE Productions</a>]</figcaption>
 </figure> 
 
 
@@ -76,13 +76,13 @@ Getting this "Rolo" mould made up as a `&'static str` required foresight, didn't
   
 Sure, we can't change the mould after we've made it (or in other words, our `&'static str` is "immutable"), but we don't care, because we know we're going to use this mould a lot.
 
-There's a thing to be aware of though. If you type `let steel_mould = "Rolo";`, your IDE will probably display:
+Here's a thing to be aware of though. If you type `let steel_mould = "Rolo";`, your IDE will probably display:
 
 {% highlight rust %}
 let steel_mould: &str = "Rolo"
 {% endhighlight %}
 
-so, notice it says the type is just `&str` without the `'static` part. Even though your IDE doesn't explicitly say it, this `&str` is a `&'static str` --- it's not "_like_" one --- it absolutely _is_ one. 
+so, notice it says the type is just a `&str` without the `'static` part. Even though your IDE doesn't explicitly say it, this `&str` is a `&'static str` --- it's not "_like_" one --- it absolutely _is_ one. 
 
 In fact, any text defined at compile time (also called a "string literal") is a `&'static str`. It lasts forever.
 
@@ -128,7 +128,7 @@ fn threedee_print(note: String) {
 In this analogy, our written note is a `String`. A written note or a `String` is a good choice when:
 
 - we can't anticipate what a dog's name will be when we open our business (we have no foresight at compile time), and/or;
-- we want the option to alter what we've written down --- both notes and `String`s can be mutable (unlike a steel moulds and `&str`s).
+- we want the option to alter what we've written down --- a notes or a `String` can be mutable (unlike a steel mould or `&str`).
 
 We still want to fulfil these orders for weird dog names because we're a business and we flippin' love money. This means we need to commit some flexible resources to this task, but we don't know how many yet.
 
@@ -209,7 +209,7 @@ in our `main` function, and continue to use `note_back` as we please.
 
 #### 3. Use a reference with &String
 
-Our last option was putting the note up in our shop window and asking the 3D printers to look at the note, and use it as a reference:
+Our last option was to put the note up in our shop window, and ask the 3D printers to look at that note and use it as a reference:
 
 {% highlight rust %}
 fn main() {
@@ -264,8 +264,8 @@ fn threedee_print(shop_window: &String) -> DeskPlate{
 
 Doing this will make the code compile fine.
 
-Bit of an aside, but if you have come across the dereferencing operator `*` before, you might wonder why you can't just use that and type `Deskplate{name: *note_copy}`. This doesn't work here, because dereferencing is sometimes achieved by making a copy of the variable, and Strings don't implement the copy trait.
-
+Bit of an aside here, but: if you have come across the dereferencing operator `*` before, you might wonder why you can't just use that and type `Deskplate{name: *note_copy}`. This doesn't work here, because dereferencing is sometimes achieved by making a copy of the variable, and Strings don't implement the copy trait.
+{: .notice}
 
 ### Converting between notes and moulds, String and &str
 
@@ -285,7 +285,7 @@ fn main() {
 
 
 #### String to &'static str: hardy ... pardy?
-Converting a `String` to a `&'static str` is not as trivial.
+Converting a `String` to a `&'static str` is not so trivial.
 
 The factory that makes steel moulds (i.e. the compiler) can do this, but it only gets  run once. Turning a String into a &'static str is what happens when we type `let mould: &str = "Rolo"` into our IDE before the code is compiled.
 
@@ -306,7 +306,7 @@ fn main() {
 
 What you've done here, is looked at the note, gone into the back room and tried to find a mould that matches your note. If the note says "Rolo", you're in luck, because past you was wise. Nice.
 
-Did you get given a name that you didn't anticipate when you set up your business? Well you ain't using a steel mould then, matey. Time to panic (or maybe fail gracefully and send the note to the 3D printers instead).
+Did you get given a name that you didn't anticipate when you set up your business? Well you ain't using a steel mould then, matey.
 
 <figure style="width: 350px" class="align-center">
   <img src="{{ site.url }}{{ site.baseurl }}/assets/images/post_imgs/string_hat.jpg" alt="">
@@ -318,11 +318,11 @@ Did you get given a name that you didn't anticipate when you set up your busines
 
 A customer with a dog named "Lord Gumzies" is insisting on a moulded nameplate, they do not want a 3D print because "3D prints look all weird and ribbed".
 
-There is something you could do --- you could try and cobble together your own mould out of polystyrene. Sure, it won't last as long as a steel mould, and you couldn't pour hot plastic into it, but maybe you could pour silicone into it instead.
+There is something you could do --- you could try and cobble together your own mould out of polystyrene. It won't last as long as a steel mould, and you can't pour hot plastic into it, but maybe you can pour silicone into it instead.
 
-A polystyrene mould is what a `&'a str` is. That cheeky `'a` thing is called a "lifetime". Lifetimes are probably a topic for another article. All you need to know is that an `&'a str` has a lifetime specifier `'a` which tells you how long the mould is going to last for.
+A polystyrene mould is what a `&'a str` is. That cheeky `'a` thing is called a "lifetime". Lifetimes are probably a topic for another post. All you need to know is that an `&'a str` has a lifetime specifier `'a` which tells you how long the mould is going to last for.
 
-Rust's compiler can often figure out how long a variable needs to last for, all on its own. Well done, Rust. If it can't do this, then clippy will moan at you and you'll need to define the lifetime... but let's not get off track.
+Rust's compiler can often figure out how long a variable needs to last for, all on its own. Well done, Rust.
 
 To convert a `String` to a `&'a str`, we do this:
 {% highlight rust %}
@@ -340,9 +340,9 @@ fn main() {
 }
 {% endhighlight %}
 
-Beware reader, be very ware. The use of the term "str" in the `as_str()` method doesn't mean you're making a `&'static str`. In fact `as_str()` will always produce a mould with a lifetime which is **not static**. Rust's compiler will try its best to make the lifetime of the variable, or the longevity of that mould, as long as it needs to be, but it can never ever be `&'static`. A `&'static str` that lasts forever must be defined at compile time.
+Beware reader, be very ware. The use of the term "str" in the `as_str()` method doesn't mean you're producting a `&'static str`. In fact `as_str()` will produce a mould with a lifetime which is **not static**. Rust's compiler will try its best to make the lifetime of the variable, or the longevity of that mould, as long as it needs to be, but it can never ever be `&'static`. A `&'static str` that lasts for as long as a program runs must be defined at compile time. Think about it --- if you define a variable after a program has already started, then it's always going to be younger than the program.
 
-This matters because if we now try to pour hot plastic into our polystyrene mould:
+This all matters because if we try to pour hot plastic into our polystyrene mould:
 
 **Warning:** This won't compile.
 {: .notice--warning}
@@ -351,7 +351,7 @@ This matters because if we now try to pour hot plastic into our polystyrene moul
 	hot_plastic(poly_mould); // ! won't run
 {% endhighlight %}
 
-we're going to end up with a hot mess. Remember, the function `fn hot_plastic(steel_mould: &'static str)` is expecting a `&'static str` --- a steel mould that lasts forever. We've just passed it a polystyrene mould, which will last for "some limited amount of time". "Forever" is much more restrictive, so we can't use this function.
+we're going to end up with a hot mess. Remember, the function `hot_plastic(steel_mould: &'static str)` is expecting a `&'static str` --- a steel mould that lasts forever. We've just passed it a polystyrene mould, which will last for "some limited amount of time". "Forever" is much more restrictive, so we can't use this function.
 
 How can we solve this? We need to define a new function, one which accepts a `&'a str`. Here's one:
 
@@ -364,18 +364,21 @@ fn silicone(any_mould: &str) {
 
 We can now pass this function a `poly_mould: &'a str` and it will work.
 
-But hang on, I told you that `&str` in your IDE always means `&'static str`, didn't I? Yep, but only when you're defining variables. If you see the term `&str` in a function's arguments, it implicity means `&'a str`.
+#### Did you ... lie to me?
+
+Hawk-eyed eagles among you have noticed that the function `silicone` can be passed a `&str`, but I told you earlier that a `&str` in your IDE always means `&'static str`, didn't I?
+
+Yeah, but the thing is, that's only when you're defining variables. If you see the term `&str` in a function's arguments, it implicity means `&'a str`.
 
 To recap:
 
 - `&str` as a variable defined at compile time probably means a `&'static str`, which lasts forever;
 - `&str` in a function's arguments means `&'a str`, which has a lifetime which might be limited.
 
-Other than that, a `&'a str` has similar behaviour to `&'static str`. They're immutable, and using them instead of `String` types can be more efficient sometimes.
 
 #### Using a &'static str in a &'a str function
 
-We can pass the function `fn silicone` a `&'a str`, but how about passing it a `&'static str`? Can we pour silicone into a steel mould?
+We can pass the function `fn silicone` a `&'a str`, but can we pass it a `&'static str`? Can we pour silicone into a steel mould?
 
 Yes, because the function `silicone` is not very restrictive: it doesn't demand variables which last "forever": it will accept a variable which lasts for any amount of time.
 
