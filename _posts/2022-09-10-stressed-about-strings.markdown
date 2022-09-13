@@ -37,7 +37,7 @@ Bear with me here.
 You want to set up a business where you sell plastic desk nameplates for dogs in high places.
 
 To make these nameplates you have two options:
-1. Get some real nice steel moulds made up (you can only do this once, ever). You are not allowed to touch these moulds, but you can point them out to a technician who will then pour molten plastic into these moulds in your shop whenever you want to make a nameplate.
+1. Get some real nice steel moulds made up (you can only do this once, ever). You are not allowed to touch these moulds, but you can point them out to your technician: they'll pour molten plastic into the moulds whenever you want to make a nameplate.
 
 2. Send the dog's name to a 3D printing company and ask them to make you a nameplate on demand.
 
