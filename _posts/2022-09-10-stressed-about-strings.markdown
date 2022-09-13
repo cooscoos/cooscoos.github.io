@@ -37,7 +37,7 @@ Bear with me here.
 You want to set up a business where you sell plastic desk nameplates for dogs in high places.
 
 To make these nameplates you have two options:
-1. Get some real nice steel moulds made up (you can only do this once, ever). You are not allowed to touch these moulds, but you can point them out to your technician: they'll pour molten plastic into the moulds whenever you want to make a nameplate.
+1. Get some real nice steel moulds made up (you can only do this once, ever). These moulds are bolted to a shelf in your shop, and your technician can take a bucket of molten plastic over to them, and use them to cast nameplates.
 
 2. Send the dog's name to a 3D printing company and ask them to make you a nameplate on demand.
 
@@ -65,20 +65,23 @@ fn hot_plastic(steel_mould: &'static str) {
 }
 {% endhighlight %}
 
-`steel_mould` here is a "string literal" --- a hard-coded string in the binary of your program. In this analogy, string literals are our steel moulds. They have the type `&'static str`. The `&` part of it means that we can use the steel mould as a reference (we can tell other functions, like our technician, where the steel moulds are), and the `'static` part means that we be certain that we can safely make reference to this mould for as long as our program (or business) is running.
+`steel_mould` here is a "string literal" --- a hard-coded string in the binary of your program. In this analogy, string literals are our steel moulds. They have the type `&'static str`:
+
+- the `&` part means that we can use the steel mould as a reference --- in other words, we can tell other functions, like our technician, where the steel mould is, and;
+- the `'static` part means that we we can safely do this for as long as our program (or business) is running.
+
+If you take a finger and point to the shelf where your steel mould is, you can be sure your steel mould will be there. For this to be true, your steel mould must be a [permanent object at a known location](https://doc.rust-lang.org/rust-by-example/scope/lifetime/static_lifetime.html).
 
 <figure style="width: 250px" class="align-left">
   <img src="{{ site.url }}{{ site.baseurl }}/assets/images/post_imgs/pug.jpg" alt="">
   <figcaption>Future you, handling Rolo with finesse and ease. [img: <a href="https://www.pexels.com/@babydov/">Ivan Babydov</a>]</figcaption>
 </figure> 
 
-Getting this "Rolo" mould made up as a string literal required foresight, didn't it? At compile time, you had to know that you wanted to commit some resources (be that money or memory) to the name "Rolo". As a reward, you get a string literal: a steel mould that you can point out to your technician for as long as you need to.
+Getting this "Rolo" mould made up as a string literal required foresight, didn't it? At compile time, you had to know that you wanted to commit resources (be that money or memory) to the name "Rolo".
 
-Notice that you, or indeed any other function, never gets to directly touch or change the steel mould:
-- You can only tell your technician _where_ the mould is, i.e. you point them to a reference, and;
-- the object behind that reference is unchangeable (or in other words, our `&'static str` is "immutable").
+In return, you get certainty. The steel mould will always be on the shelf (it's bolted there after all), so nobody can ever move it or hide it from you. Nobody, including you, can ever alter the steel mould (we say a `&'static str` is "immutable").
 
-But that's fine for us, because we know we're going to use this "Rolo" mould a lot.
+These constraints could be annoying, but you're happy because you know you're going to use this mould a lot.
 
 One other thing to be aware of: if you type `let steel_mould = "Rolo";`, your IDE will probably display:
 
@@ -88,7 +91,7 @@ let steel_mould: &str = "Rolo"
 
 so, notice it says the type is just a `&str` without the `'static` part. Even though your IDE doesn't explicitly say it, this `&str` is a `&'static str` --- it's not "_like_" one --- it absolutely _is_ one. 
 
-In fact, any text defined at compile time (a "string literal") is a `&'static str`. It can safely be used as a reference for as long as you want.
+In fact, any text defined at compile time (a "string literal") is a `&'static str`. It can safely be used for as long as you want.
 
 This point might lead to confusion later, so bear in mind that when we're defining variables at compile time, a `&str` and a `&'static str` are exactly the same thing.
 
@@ -307,9 +310,9 @@ fn main() {
 
 What you've done here, is looked at the note, gone into the back room and tried to find a mould that matches your note. If the note says "Rolo", you're in luck, because past you was wise. Nice.
 
-Did you get given a name that you didn't anticipate when you set up your business? Well you ain't using a steel mould then, matey.
+Did you get given a name that you didn't anticipate when you set up your business? Well you ain't using a steel mould then, matey*.
 
-Kind of. There are ways to [leak the memory of a String to produce a &'static str](https://stackoverflow.com/questions/23975391/how-to-convert-a-string-into-a-static-str), but they go beyond the scope of this simple analogy.
+*Kind of. There are ways to [leak the memory of a String to produce a &'static str](https://stackoverflow.com/questions/23975391/how-to-convert-a-string-into-a-static-str), but they go beyond the scope of this simple analogy, and it's not something you want to do a lot anyway.
 {: .notice}
 
 <figure style="width: 350px" class="align-center">
@@ -322,11 +325,11 @@ Kind of. There are ways to [leak the memory of a String to produce a &'static st
 
 A customer with a dog named "Lord Gumzies" is insisting on a moulded nameplate, they do not want a 3D print because "3D prints look all weird and ribbed".
 
-There is something you could do --- you could try and cobble together your own mould out of polystyrene. It won't last as long as a steel mould, and you can't ask your technician to pour hot plastic into it, but maybe they can pour silicone into it instead.
+There is something you could do --- you could try and cobble together your own mould out of polystyrene, and glue it to the shelf temporarily. It won't last as long as a steel mould, and you can't ask your technician to pour hot plastic into it, but maybe they can pour silicone into it instead.
 
-A polystyrene mould is what a `&'a str` is. That cheeky `'a` thing is similar to `'static`, and it's called a "lifetime". Lifetimes are probably a topic for another post. All you need to know is that an `&'a str` has a lifetime specifier `'a` which tells you how long the mould is going to last for.
+A polystyrene mould is what a `&'a str` is. That cheeky `'a` thing is similar to `'static` from before, and it's called a "lifetime". Lifetimes are a topic for another post --- all you need to know is that a `&'a str` has a lifetime specifier `'a` which tells you how long the mould is going to last for.
 
-Rust's compiler can often figure out how long a variable needs to last for, all on its own. Well done, Rust.
+Rust's compiler can often (but not always) figure out how long a variable needs to last for, all on its own. Well done, Rust.
 
 To convert a `String` to a `&'a str`, we do this:
 {% highlight rust %}
@@ -344,7 +347,9 @@ fn main() {
 }
 {% endhighlight %}
 
-Beware reader, be very ware. The use of the term "str" in the `as_str()` method doesn't mean you're producting a `&'static str`. In fact `as_str()` will produce a mould with a lifetime which is **not static**. Rust's compiler will try its best to make the lifetime of the variable, or the longevity of that mould, as long as it needs to be, but it won't be `&'static`. A `&'static str` needs to be something we can be confident that we can make reference to for as long as our business runs. Polystyrene moulds aren't quite permanent.
+Beware reader, be very ware. The use of the term "str" in the `as_str()` method doesn't mean you're producing a `&'static str`. In fact `as_str()` will produce a mould with a lifetime which is **not static**. Rust's compiler will try its best to make the lifetime of the variable, or the longevity of that mould, as long as it needs to be, but it won't be `&'static`.
+
+A `&'static str` needs to be a valid reference for as long as our program runs, so the objects it points to must be permanent. If we define an object _after_ compile time, that means that we don't have a permanent object by definition.
 
 This all matters because if we try to pour hot plastic into our polystyrene mould:
 
@@ -355,9 +360,11 @@ This all matters because if we try to pour hot plastic into our polystyrene moul
 	hot_plastic(poly_mould); // ! won't run
 {% endhighlight %}
 
-we're going to end up with a hot mess. Remember, the function `hot_plastic(steel_mould: &'static str)` is expecting a `&'static str` --- our technician is expecting to pointed to a steel mould that remains the same forever. We've just passed it a polystyrene mould, which will last for "some limited amount of time". There's therefore a risk that we point our technician to something flimsy and less permanent. "Forever" is much more restrictive, so we can't use this function.
+we're going to end up with a hot mess. Remember, the function `hot_plastic(steel_mould: &'static str)` is expecting a `&'static str` --- our technician is expecting to be pointed to a permanent steel mould. 
 
-How can we solve this? We need to define a new function, one which accepts a `&'a str`. Here's one:
+Instead, we've pointed out a polystyrene mould that "might be there", to a technician who is carrying a bucket of piping hot liquid death. "Forever" is much more restrictive than "might be there".
+
+How can we solve this? We need to define a new function, a new role for our technician, and one which accepts a `&'a str`. Here's one:
 
 {% highlight rust %}
 // Pour silicone in, get nameplate out
@@ -372,19 +379,13 @@ We can now pass this function a `poly_mould: &'a str` and it will work.
 
 Hawk-eyed eagles among you have noticed that the function `silicone` can be passed a `&str`, but I told you earlier that a `&str` in your IDE always means `&'static str`, didn't I?
 
-Yeah, but the thing is, that's only when you're defining variables. If you see the term `&str` in a function's arguments, it implicity means `&'a str`.
-
-To recap:
-
-- `&str` as a string literal defined at compile time produces a `&'static str`, something we can safely use a reference forever;
-- `&str` in a function's arguments means `&'a str`, which means the reference to it has a limited lifetime.
-
+Yeah, but the thing is, that's when you're defining string literals. If you see the term `&str` in a function's arguments, it implicity means `&'a str`. This switching up of nomenclature will feel natural eventually, but don't let it catch you out.
 
 #### Using a &'static str in a &'a str function
 
-We can pass the function `fn silicone` a `&'a str`, but can we pass it a `&'static str`? Can we ask our technician to pour silicone into a steel mould?
+We can pass the `fn silicone` a `&'a str`, but can we pass it a `&'static str`? Can we ask our technician to pour silicone into a steel mould?
 
-Yes, because the function `silicone` is not very restrictive: it doesn't demand references that will be valid "forever": it will accept references that last any amount of time.
+Yes, because the function `silicone` is not very restrictive: our technician doesn't need to be pointed to references that will be valid "forever" when they're only carrying silicone. In this role, they will accept references that last any amount of time.
 
 In other words:
 
