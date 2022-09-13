@@ -322,9 +322,9 @@ Kind of. There are ways to [leak the memory of a String to produce a &'static st
 
 A customer with a dog named "Lord Gumzies" is insisting on a moulded nameplate, they do not want a 3D print because "3D prints look all weird and ribbed".
 
-There is something you could do --- you could try and cobble together your own mould out of polystyrene. It won't last as long as a steel mould, and you can't pour hot plastic into it, but maybe you can pour silicone into it instead.
+There is something you could do --- you could try and cobble together your own mould out of polystyrene. It won't last as long as a steel mould, and you can't ask your technician to pour hot plastic into it, but maybe they can pour silicone into it instead.
 
-A polystyrene mould is what a `&'a str` is. That cheeky `'a` thing is called a "lifetime". Lifetimes are probably a topic for another post. All you need to know is that an `&'a str` has a lifetime specifier `'a` which tells you how long the mould is going to last for.
+A polystyrene mould is what a `&'a str` is. That cheeky `'a` thing is similar to `'static`, and it's called a "lifetime". Lifetimes are probably a topic for another post. All you need to know is that an `&'a str` has a lifetime specifier `'a` which tells you how long the mould is going to last for.
 
 Rust's compiler can often figure out how long a variable needs to last for, all on its own. Well done, Rust.
 
@@ -344,7 +344,7 @@ fn main() {
 }
 {% endhighlight %}
 
-Beware reader, be very ware. The use of the term "str" in the `as_str()` method doesn't mean you're producting a `&'static str`. In fact `as_str()` will produce a mould with a lifetime which is **not static**. Rust's compiler will try its best to make the lifetime of the variable, or the longevity of that mould, as long as it needs to be, but it can never ever be `&'static`. A `&'static str` that lasts for as long as a program runs must be defined at compile time. Think about it --- if you define a variable after a program has already started, then it's always going to be younger than the program.
+Beware reader, be very ware. The use of the term "str" in the `as_str()` method doesn't mean you're producting a `&'static str`. In fact `as_str()` will produce a mould with a lifetime which is **not static**. Rust's compiler will try its best to make the lifetime of the variable, or the longevity of that mould, as long as it needs to be, but it won't be `&'static`. A `&'static str` needs to be something we can be confident that we can make reference to for as long as our business runs. Polystyrene moulds aren't quite permanent.
 
 This all matters because if we try to pour hot plastic into our polystyrene mould:
 
@@ -355,7 +355,7 @@ This all matters because if we try to pour hot plastic into our polystyrene moul
 	hot_plastic(poly_mould); // ! won't run
 {% endhighlight %}
 
-we're going to end up with a hot mess. Remember, the function `hot_plastic(steel_mould: &'static str)` is expecting a `&'static str` --- a steel mould that lasts forever. We've just passed it a polystyrene mould, which will last for "some limited amount of time". "Forever" is much more restrictive, so we can't use this function.
+we're going to end up with a hot mess. Remember, the function `hot_plastic(steel_mould: &'static str)` is expecting a `&'static str` --- our technician is expecting to pointed to a steel mould that remains the same forever. We've just passed it a polystyrene mould, which will last for "some limited amount of time". There's therefore a risk that we point our technician to something flimsy and less permanent. "Forever" is much more restrictive, so we can't use this function.
 
 How can we solve this? We need to define a new function, one which accepts a `&'a str`. Here's one:
 
@@ -376,15 +376,15 @@ Yeah, but the thing is, that's only when you're defining variables. If you see t
 
 To recap:
 
-- `&str` as a variable defined at compile time probably means a `&'static str`, which lasts forever;
-- `&str` in a function's arguments means `&'a str`, which has a lifetime which might be limited.
+- `&str` as a string literal defined at compile time produces a `&'static str`, something we can safely use a reference forever;
+- `&str` in a function's arguments means `&'a str`, which means the reference to it has a limited lifetime.
 
 
 #### Using a &'static str in a &'a str function
 
-We can pass the function `fn silicone` a `&'a str`, but can we pass it a `&'static str`? Can we pour silicone into a steel mould?
+We can pass the function `fn silicone` a `&'a str`, but can we pass it a `&'static str`? Can we ask our technician to pour silicone into a steel mould?
 
-Yes, because the function `silicone` is not very restrictive: it doesn't demand variables which last "forever": it will accept a variable which lasts for any amount of time.
+Yes, because the function `silicone` is not very restrictive: it doesn't demand references that will be valid "forever": it will accept references that last any amount of time.
 
 In other words:
 
