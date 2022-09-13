@@ -385,7 +385,7 @@ Yeah, but the thing is, that's when you're defining string literals. If you see 
 
 We can pass the `fn silicone` a `&'a str`, but can we pass it a `&'static str`? Can we ask our technician to pour silicone into a steel mould?
 
-Yes, because the function `silicone` is not very restrictive: our technician doesn't need to be pointed to references that will be valid "forever" when they're only carrying silicone. In this role, they will accept references that last any amount of time, including forever
+Yes, because the function `silicone` is not very restrictive: our technician doesn't need to be pointed to references that will be valid "forever" when they're only carrying silicone. In this role, they will accept references that last any amount of time, including forever.
 
 
 
