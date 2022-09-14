@@ -65,14 +65,14 @@ fn hot_plastic(steel_mould_location: &'static str) {
 }
 {% endhighlight %}
 
-The name `"Rolo"` in the code above is a "string literal": a hard-coded string defined in the binary of your program. String literals are objects with a `static` lifetime --- this means that they will last for as long as our program (or business) is running. You can think of string literals as being like steel moulds; the laws of the Universe --- they're are unchanging and unchangeable things that will [always be there in memory](https://doc.rust-lang.org/rust-by-example/scope/lifetime/static_lifetime.html).
+The name `"Rolo"` in the code above is a "string literal": a hard-coded string defined in the binary of your program. String literals are objects with a `static` lifetime --- this means that they will last for as long as our program (or business) is running. You can think of string literals as being like steel moulds, or the laws of the Universe --- they are unchanging and unchangeable things that will [always be there in memory](https://doc.rust-lang.org/rust-by-example/scope/lifetime/static_lifetime.html).
 
-`point_finger`, on the other hand, is not a string literal: it is a variable that points to the string literal `"Rolo"`. It has the type `&'static str`:
+`point_finger`, on the other hand, is not a string literal: it is a variable that makes reference to the string literal `"Rolo"`. It has the type `&'static str`:
 
-- the `&` part means that we're pointing to a reference, or a place --- in this analogy, the place is the fixed location on the shelf that steel mould is bolted to;
-- the `'static` part means that we we are pointing to a static object that exists forever (our steel mould).
+- the `&` part means that we're pointing to a reference, a "place" --- that place is the fixed location on the shelf where your steel mould is bolted;
+- the `'static` part means that we can safely point at this object forever (after all, we're pointing at a steel mould, so it will always be there).
 
-Imagine you lose your finger in a freak cat accident. If you plan ahead, then you can still use other methods to point to the right location on the a shelf:
+Imagine you lose your finger in a freak accident. If you plan ahead, then you can still use other methods to point to the right location on the shelf:
 
 {% highlight rust %}
 fn main() {
@@ -85,7 +85,7 @@ fn main() {
 
         // Write on signpost so that it also points there
         use_signpost = point_finger;
-    } // You lose your finger here.
+    } // Oh no. You lose your finger here.
 
     // If you try this:
     // println!("{point_finger}");
@@ -105,9 +105,9 @@ So you see, the _variable_ `point_finger` isn't static, it just directs us to so
 
 Getting this "Rolo" mould made up as a string literal required foresight, didn't it? At compile time, you had to know that you wanted to commit resources (be that money or memory) to the name "Rolo".
 
-In return, you get certainty. The steel mould will always be on the shelf (it's bolted there after all), so nobody can ever move it or hide it from you. Nobody, including you, can ever alter the steel mould (we say that `'static str` are "immutable").
+In return, you get certainty. The steel mould will always be on the shelf, and nobody (not even you) can ever move it, hide it, or change it (we say that `'static str` are "immutable").
 
-These constraints could be annoying, but you're happy because you know you're going to use this mould a lot.
+These constraints could be annoying in some circumstances, but you're happy because you know you're going to use this mould a lot.
 
 While string literals are not mutable, `&'static str` variables *are* mutable. You can use your finger to point at other things:
 
@@ -163,7 +163,7 @@ fn threedee_print(note: String) {
 In this analogy, our written note is a `String`. A written note or a `String` is a good choice when:
 
 - we can't anticipate what a dog's name will be when we open our business (we have no foresight at compile time), and/or;
-- we want the option to alter what we've written down --- a notes or a `String` can be mutable (unlike a steel mould or `&str`).
+- we want the option to alter what we've written down --- a notes or a `String` can be mutable (unlike a steel mould or string literal).
 
 We still want to fulfil these orders for weird dog names because we're a business and we flippin' love money. This means we need to commit some flexible resources to this task, but we don't know how many yet.
 
@@ -176,7 +176,7 @@ The requests for dog names might be short names, they might be long, we might ge
 
 To be safe, we keep a heap of paper and pencils aside just in case (paper and pencils are computer memory here, by the way, yeah-I-know-you-knew-that).
 
-Could we send a mould to a 3D printing company who are expecting written notes? In other languages, you could totally do this and expect the language to handle the conversions, but in Rust, the answer is rigidly "no".
+Could we send the location of a mould to a 3D printing company who are expecting written notes? In other languages, you could totally do this and expect the language to handle the conversions, but in Rust, the answer is rigidly "no".
 
 
 ### You've lost your note!
@@ -353,9 +353,9 @@ Did you get given a name that you didn't anticipate when you set up your busines
 
 A customer with a dog named "Lord Gumzies" is insisting on a moulded nameplate, they do not want a 3D print because "3D prints look all weird and ribbed".
 
-While you can't make a new steel mould, you could try and cobble together your own mould out of polystyrene, and glue it to the shelf. Your polystyrene mould won't last as long as a steel one, and you can't ask your technician to pour hot plastic into it, but maybe they can pour silicone into it instead.
+While you can't make a new steel mould, you could try and cobble together your own mould out of polystyrene, and leave it lying on the shelf. Your polystyrene mould won't last as long as a steel one, and it might move.
 
-A polystyrene mould is what a `&'a str` is. That cheeky `'a` thing is similar to `'static` from before, and it's called a "lifetime". `&'a str` has a lifetime specifier `'a` which tells you how long we can safely point to the polystyrene mould (after that lifetime is up, all bets are off).
+A polystyrene mould is what a `&'a str` is. That cheeky `'a` thing is similar to `'static` from before, and it's called a "lifetime". `&'a str` has a lifetime specifier `'a` which tells you how long we can safely point to the polystyrene mould (after that lifetime is up, we're no longer guaranteed to find it at that location).
 
 Rust's compiler can often (but not always) figure out how long a variable or reference needs to last for, all on its own. Well done, Rust.
 
@@ -403,11 +403,8 @@ fn silicone(any_mould: &str) {
 
 We can now pass this function a `poly_mould: &'a str` and it will work.
 
-#### Did you ... lie to me?
-
-Hawk-eyed eagles among you have noticed that the function `silicone` can be passed a `&str`, but I told you earlier that a `&str` in your IDE always means `&'static str`, didn't I?
-
-Yeah, but the thing is, that's when you're defining string literals. If you see the term `&str` in a function's arguments, it implicity means `&'a str`. This switching up of nomenclature will feel natural eventually, but don't let it catch you out.
+Hawk-eyed eagles among you have noticed that the function `silicone` can be passed a `&str`, but I told you earlier that a `&str` in your IDE always means `&'static str`, didn't I? Yeah, when you're defining string literals. If you see the term `&str` in a function's arguments, it implicity means `&'a str`. This switching up of nomenclature will feel natural and totally cool one day, I promise.
+{: .notice}
 
 #### Using a &'static str in a &'a str function
 
