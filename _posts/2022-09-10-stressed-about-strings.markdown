@@ -26,7 +26,7 @@ Let's try something different.
 
 Here, we'll use an analogy, and look at some code along the way.
 
-Analogies ain't perfect, but I hope this one makes the etopic stick better for some of you. If it does, you can return to those other articles with some intuition.
+Analogies ain't perfect, but I hope this one makes the topic stick better for some of you. If it does, you can return to those other articles with some intuition.
 
 
 
